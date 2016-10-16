@@ -1,0 +1,7 @@
+interface=wlan0
+no-dhcp-interface=eth0
+dhcp-range={{ pi_wlan_ap_dhcp_range }},24h
+dhcp-option=option:dns-server,{{ pi_wlan_ap_ip }}
+{% for entry, value in pi_wlan_ap_dns_entries.items() %}
+address=/{{ entry }}/{{ value }}
+{% endfor %}

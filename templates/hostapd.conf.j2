@@ -1,0 +1,15 @@
+interface=wlan0
+ssid={{ pi_wlan_ap_ssid }}
+channel={{ pi_wlan_ap_channel }}
+country_code=DE
+ieee80211n=1
+wmm_enabled=1
+hw_mode=g
+ignore_broadcast_ssid=0
+{% if pi_wlan_ap_password %}
+auth_algs=1
+wpa=2
+wpa_key_mgmt=WPA-PSK
+rsn_pairwise=CCMP
+wpa_passphrase={{ pi_wlan_ap_password }}
+{% endif %}

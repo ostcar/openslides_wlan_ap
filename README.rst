@@ -6,7 +6,7 @@ Installs wlan access point on an Raspberry Pi 3 to use it for OpenSlides.
 Requirements
 ------------
 
-Currently this role only supports Ubuntu 16.04 and Archlinux.
+Currently this role only supports Archlinux.
 
 
 Role Variables

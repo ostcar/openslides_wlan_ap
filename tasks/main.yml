@@ -10,37 +10,17 @@
 
 - name: Configure wlan0
   become: yes
-  copy:
+  template:
     dest: /etc/systemd/network/wlan0.network
-    content: |
-      [Match]
-      Name=wlan0
-
-      [Network]
-      Address={{ pi_wlan_ap_ip }}
+    src: wlan0.network.j2
   notify:
   - restart network
 
 - name: Configure hostapd
   become: yes
-  copy:
+  template:
     dest: /etc/hostapd/hostapd.conf
-    content: |
-      interface=wlan0
-      ssid={{ pi_wlan_ap_ssid }}
-      channel={{ pi_wlan_ap_channel }}
-      country_code=DE
-      ieee80211n=1
-      wmm_enabled=1
-      hw_mode=g
-      ignore_broadcast_ssid=0
-      {% if pi_wlan_ap_password %}
-      auth_algs=1
-      wpa=2
-      wpa_key_mgmt=WPA-PSK
-      rsn_pairwise=CCMP
-      wpa_passphrase={{ pi_wlan_ap_password }}
-      {% endif %}
+    src: hostapd.conf.j2
     mode: 600
   notify:
   - restart hostapd
@@ -54,18 +34,24 @@
 
 - name: Configure dnsmasq
   become: yes
-  copy:
+  template:
     dest: /etc/dnsmasq.conf
-    content: |
-      interface=wlan0
-      no-dhcp-interface=eth0
-      dhcp-range={{ pi_wlan_ap_dhcp_range }},24h
-      dhcp-option=option:dns-server,{{ pi_wlan_ap_ip }}
-      {% for entry, value in pi_wlan_ap_dns_entries.items() %}
-      address=/{{ entry }}/{{ value }}
-      {% endfor %}
+    src: dnsmasq.conf.j2
   notify:
   - restart dnsmasq
+
+- name: Stop and disable systemd-resolved
+  become: yes
+  service:
+    name: systemd-resolved
+    state: stopped
+    enabled: false
+
+- name: Configure /etc/resolv.conf
+  become: yes
+  template:
+    dest: /etc/resolv.conf
+    src: resolv.conf.j2
 
 - name: Start and enable dnsmasq
   become: yes
