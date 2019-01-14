@@ -1,9 +1,11 @@
 ---
 - name: Install packages
   become: yes
-  pacman:
+  apt:
     name: "{{ item }}"
     state: present
+    update_cache: yes
+    cache_valid_time: 3600
   with_items:
   - hostapd
   - dnsmasq
@@ -22,6 +24,14 @@
     dest: /etc/hostapd/hostapd.conf
     src: hostapd.conf.j2
     mode: 600
+  notify:
+  - restart hostapd
+
+- name: Set default configuration for hostapd
+  lineinfile:
+    dest: /etc/default/hostapd
+    regexp: ^\#?DAEMON_CONF
+    line: DAEMON_CONF="/etc/hostapd/hostapd.conf"
   notify:
   - restart hostapd
 
